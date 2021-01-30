@@ -2,15 +2,16 @@ import React from 'react';
 import {
   BrowserRouter, Route, Switch, Redirect,
 } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { Home } from './Home';
-import { Login } from './Login';
+import { Home } from './components/Home';
+import { Login } from './components/Login';
 
 export function Routes () {
   return (
     <BrowserRouter>
       <Switch>
-        <PrivateRoute path="/" component={Home} />
+        <PrivateRoute exact path="/">
+          <Home />
+        </PrivateRoute>
         <Route path="/login">
           <Login />
         </Route>
@@ -19,26 +20,21 @@ export function Routes () {
   );
 }
 
-function PrivateRoute ({ component: Component, ...rest }) {
+function PrivateRoute ({ children, ...rest }) {
   return (
     <Route
       {...rest}
-      render={(props) => (localStorage.getItem('logged') ? (
-        <Component {...props} />
+      render={({ location }) => (localStorage.getItem('logged') ? (
+        children
       )
         : (
           <Redirect
             to={{
               pathname: '/login',
-              state: { from: props.location },
+              state: { from: location },
             }}
           />
         ))}
     />
   );
 }
-
-PrivateRoute.propTypes = {
-  component: PropTypes.element.isRequired,
-  location: PropTypes.node.isRequired,
-};
